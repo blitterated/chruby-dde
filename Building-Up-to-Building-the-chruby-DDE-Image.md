@@ -165,14 +165,6 @@ ruby-install ruby 2.7.1 -- --with-openssl-dir="${OPENSSL_1_1_DIR}"
 ruby-install ruby 2.7.6 -- --with-openssl-dir="${OPENSSL_1_1_DIR}"
 ```
 
-Install time from 2.7.6 for reference.
-
-```text
-real 4m43.459s
-user 4m5.580s
-sys  0m36.874s
-```
-
 Clean up `/tmp`.
 
 ```sh
@@ -262,7 +254,7 @@ chruby-dde-by-hand        latest    030e49cc82b6   5 minutes ago        1.47GB
 
 Blerg! Not too helpful. The next step is to investigate [Multi-stage builds](https://docs.docker.com/build/building/multi-stage/).
 
-#### Capturing `make install` and `ruby-install` output
+## Capturing `make install` and `ruby-install` output
 
 I need to know where things are being installed to in the first build stage, so I can copy them completely to the second build stage. To do so I used `bash` redirects and `tee`. Then I pushed the resulting log files out to the host through a bind mount.
 
@@ -292,6 +284,7 @@ cp make-install-ruby-install.txt /host/
 
 Now install a ruby with `ruby-install` and capture all of its output with `tee`.
 
+2.7.6
 
 ```sh
 ruby-install ruby 2.7.6 -- --with-openssl-dir="/opt/openssl-1.1.1q/" 2>&1 | tee ruby-install-2.7.6.txt
@@ -301,7 +294,17 @@ ruby-install ruby 2.7.6 -- --with-openssl-dir="/opt/openssl-1.1.1q/" 2>&1 | tee 
 cp ruby-install-2.7.6.txt /host/
 ```
 
-#### I Took a Peek at `/opt/` before and after installing OpenSSL 1.1.1
+3.1.2, at least this version builds with OpenSSL 3
+
+```sh
+ruby-install ruby 3.1.2 2>&1 | tee ruby-install-3.1.2.txt
+```
+
+```sh
+cp ruby-install-3.1.2.txt /host/
+```
+
+## I Took a Peek at `/opt/` before and after installing OpenSSL 1.1.1
 
 Before:
 
@@ -318,7 +321,124 @@ root@1b8121f75914:/tmp/openssl-1.1.1q# ls /opt
 openssl-1.1.1q
 ```
 
+## Ruby Build Times
 
+2.7.6
+
+```text
+real 4m43.459s
+user 4m5.580s
+sys  0m36.874s
+```
+
+3.1.2
+
+```text
+real 6m31.508s
+user 5m39.626s
+sys  0m48.139s
+```
+
+## `ruby-install` Build Errors with OpenSSL 3
+
+Ruby 2.7.1
+
+```text
+ossl_pkey_rsa.c: At top level:
+cc1: note: unrecognized command-line option '-Wno-self-assign' may have been intended to silence earlier diagnostics
+cc1: note: unrecognized command-line option '-Wno-parentheses-equality' may have been intended to silence earlier diagnostics
+cc1: note: unrecognized command-line option '-Wno-constant-logical-operand' may have been intended to silence earlier diagnostics
+make[2]: *** [Makefile:313: ossl_pkey_rsa.o] Error 1
+make[2]: Leaving directory '/usr/local/src/ruby-2.7.1/ext/openssl'
+make[1]: *** [exts.mk:251: ext/openssl/all] Error 2
+make[1]: Leaving directory '/usr/local/src/ruby-2.7.1'
+make: *** [uncommon.mk:295: build-ext] Error 2
+!!! Compiling ruby 2.7.1 failed!
+```
+
+Ruby 2.7.6
+
+```text
+*** Following extensions are not compiled:
+openssl:
+	Could not be configured. It will not be installed.
+	/usr/local/src/ruby-2.7.6/ext/openssl/extconf.rb:111: OpenSSL >= 1.0.1, < 3.0.0 or LibreSSL >= 2.5.0 is required
+	Check ext/openssl/mkmf.log for more details.
+dbm:
+	Could not be configured. It will not be installed.
+	Check ext/dbm/mkmf.log for more details.
+*** Fix the problems, then remove these directories and try again if you want.
+make[1]: Leaving directory '/usr/local/src/ruby-2.7.6'
+making enc
+make[1]: Entering directory '/usr/local/src/ruby-2.7.6'
+make[1]: Nothing to be done for 'enc'.
+make[1]: Leaving directory '/usr/local/src/ruby-2.7.6'
+making trans
+make[1]: Entering directory '/usr/local/src/ruby-2.7.6'
+make[1]: Nothing to be done for './enc/trans'.
+make[1]: Leaving directory '/usr/local/src/ruby-2.7.6'
+making encs
+make[1]: Entering directory '/usr/local/src/ruby-2.7.6'
+make[1]: Nothing to be done for 'encs'.
+make[1]: Leaving directory '/usr/local/src/ruby-2.7.6'
+Generating RDoc documentation
+Parsing sources...
+100% [1144/1144]  win32/README.win32
+
+Generating RI format into /usr/local/src/ruby-2.7.6/.ext/rdoc...
+
+  Files:       1144
+
+  Classes:     1619 ( 759 undocumented)
+  Modules:      328 ( 135 undocumented)
+  Constants:   2435 ( 726 undocumented)
+  Attributes:  1490 ( 559 undocumented)
+  Methods:    13068 (4014 undocumented)
+
+  Total:      18940 (6193 undocumented)
+   67.30% documented
+
+  Elapsed: 28.6s
+
+generating x86_64-linux-fake.rb
+x86_64-linux-fake.rb updated
+./miniruby -I./lib -I. -I.ext/common  ./tool/runruby.rb --extout=.ext  -- --disable-gems -r./x86_64-linux-fake ./tool/rbinstall.rb --make="make" --dest-dir="" --extout=".ext" --mflags="" --make-flags="" --data-mode=0644 --prog-mode=0755 --installed-list .installed.list --mantype="doc" --rdoc-output=".ext/rdoc" --html-output=".ext/html"
+installing binary commands:         /opt/rubies/ruby-2.7.6/bin
+installing base libraries:          /opt/rubies/ruby-2.7.6/lib
+installing arch files:              /opt/rubies/ruby-2.7.6/lib/ruby/2.7.0/x86_64-linux
+installing extension objects:       /opt/rubies/ruby-2.7.6/lib/ruby/2.7.0/x86_64-linux
+installing extension objects:       /opt/rubies/ruby-2.7.6/lib/ruby/site_ruby/2.7.0/x86_64-linux
+installing extension objects:       /opt/rubies/ruby-2.7.6/lib/ruby/vendor_ruby/2.7.0/x86_64-linux
+installing extension headers:       /opt/rubies/ruby-2.7.6/include/ruby-2.7.0/x86_64-linux
+installing extension scripts:       /opt/rubies/ruby-2.7.6/lib/ruby/2.7.0
+installing extension scripts:       /opt/rubies/ruby-2.7.6/lib/ruby/site_ruby/2.7.0
+installing extension scripts:       /opt/rubies/ruby-2.7.6/lib/ruby/vendor_ruby/2.7.0
+installing extension headers:       /opt/rubies/ruby-2.7.6/include/ruby-2.7.0/ruby
+installing rdoc:                    /opt/rubies/ruby-2.7.6/share/ri/2.7.0/system
+installing html-docs:               /opt/rubies/ruby-2.7.6/share/doc/ruby
+installing capi-docs:               /opt/rubies/ruby-2.7.6/share/doc/ruby
+installing command scripts:         /opt/rubies/ruby-2.7.6/bin
+installing library scripts:         /opt/rubies/ruby-2.7.6/lib/ruby/2.7.0
+installing common headers:          /opt/rubies/ruby-2.7.6/include/ruby-2.7.0
+installing manpages:                /opt/rubies/ruby-2.7.6/share/man (man1, man5)
+installing default gems from lib:   /opt/rubies/ruby-2.7.6/lib/ruby/gems/2.7.0 (build_info, cache, doc, extensions, gems, specifications)
+                                    benchmark 0.1.0
+Traceback (most recent call last):
+	11: from ./tool/rbinstall.rb:947:in `<main>'
+	10: from ./tool/rbinstall.rb:947:in `each'
+	 9: from ./tool/rbinstall.rb:950:in `block in <main>'
+	 8: from ./tool/rbinstall.rb:799:in `block in <main>'
+	 7: from ./tool/rbinstall.rb:835:in `install_default_gem'
+	 6: from ./tool/rbinstall.rb:835:in `each'
+	 5: from ./tool/rbinstall.rb:845:in `block in install_default_gem'
+	 4: from ./tool/rbinstall.rb:279:in `open_for_install'
+	 3: from ./tool/rbinstall.rb:846:in `block (2 levels) in install_default_gem'
+	 2: from /usr/local/src/ruby-2.7.6/lib/rubygems/specification.rb:2430:in `to_ruby'
+	 1: from /usr/local/src/ruby-2.7.6/lib/rubygems/core_ext/kernel_require.rb:83:in `require'
+/usr/local/src/ruby-2.7.6/lib/rubygems/core_ext/kernel_require.rb:83:in `require': cannot load such file -- openssl (LoadError)
+make: *** [uncommon.mk:373: do-install-all] Error 1
+!!! Installation of ruby 2.7.6 failed!
+```
 
 
 
