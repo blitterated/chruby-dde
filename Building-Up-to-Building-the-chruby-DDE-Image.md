@@ -304,7 +304,9 @@ ruby-install ruby 3.1.2 2>&1 | tee ruby-install-3.1.2.txt
 cp ruby-install-3.1.2.txt /host/
 ```
 
-## I Took a Peek at `/opt/` before and after installing OpenSSL 1.1.1
+# Ephemera
+
+### I Took a Peek at `/opt/` before and after installing OpenSSL 1.1.1
 
 Before:
 
@@ -321,7 +323,15 @@ root@1b8121f75914:/tmp/openssl-1.1.1q# ls /opt
 openssl-1.1.1q
 ```
 
-## Ruby Build Times
+### Ruby Build Times
+
+2.7.1
+
+```text
+real 4m43.459s
+user 4m5.580s
+sys  0m36.874s
+```
 
 2.7.6
 
@@ -339,7 +349,66 @@ user 5m39.626s
 sys  0m48.139s
 ```
 
-## `ruby-install` Build Errors with OpenSSL 3
+### `irb` issue with `ruby` 2.7.1
+
+Solution found [here](https://www.semicolonandsons.com/code_diary/unix/do-not-rely-on-the-the-HOME-variable-being-available-in-system-scripts).
+
+The error:
+
+```text
+root@a81dcd11c994:/# irb
+irb(main):001:0> Traceback (most recent call last):
+	23: from /opt/rubies/ruby-2.7.1/bin/irb:23:in `<main>'
+	22: from /opt/rubies/ruby-2.7.1/bin/irb:23:in `load'
+	21: from /opt/rubies/ruby-2.7.1/lib/ruby/gems/2.7.0/gems/irb-1.2.3/exe/irb:11:in `<top (required)>'
+	20: from /opt/rubies/ruby-2.7.1/lib/ruby/2.7.0/irb.rb:399:in `start'
+	19: from /opt/rubies/ruby-2.7.1/lib/ruby/2.7.0/irb.rb:470:in `run'
+	18: from /opt/rubies/ruby-2.7.1/lib/ruby/2.7.0/irb.rb:470:in `catch'
+	17: from /opt/rubies/ruby-2.7.1/lib/ruby/2.7.0/irb.rb:471:in `block in run'
+	16: from /opt/rubies/ruby-2.7.1/lib/ruby/2.7.0/irb.rb:536:in `eval_input'
+	15: from /opt/rubies/ruby-2.7.1/lib/ruby/2.7.0/irb/ruby-lex.rb:134:in `each_top_level_statement'
+	14: from /opt/rubies/ruby-2.7.1/lib/ruby/2.7.0/irb/ruby-lex.rb:134:in `catch'
+	13: from /opt/rubies/ruby-2.7.1/lib/ruby/2.7.0/irb/ruby-lex.rb:135:in `block in each_top_level_statement'
+	12: from /opt/rubies/ruby-2.7.1/lib/ruby/2.7.0/irb/ruby-lex.rb:135:in `loop'
+	11: from /opt/rubies/ruby-2.7.1/lib/ruby/2.7.0/irb/ruby-lex.rb:138:in `block (2 levels) in each_top_level_statement'
+	10: from /opt/rubies/ruby-2.7.1/lib/ruby/2.7.0/irb/ruby-lex.rb:166:in `lex'
+	 9: from /opt/rubies/ruby-2.7.1/lib/ruby/2.7.0/irb.rb:517:in `block in eval_input'
+	 8: from /opt/rubies/ruby-2.7.1/lib/ruby/2.7.0/irb.rb:695:in `signal_status'
+	 7: from /opt/rubies/ruby-2.7.1/lib/ruby/2.7.0/irb.rb:518:in `block (2 levels) in eval_input'
+	 6: from /opt/rubies/ruby-2.7.1/lib/ruby/2.7.0/irb/input-method.rb:262:in `gets'
+	 5: from /opt/rubies/ruby-2.7.1/lib/ruby/2.7.0/forwardable.rb:235:in `readmultiline'
+	 4: from /opt/rubies/ruby-2.7.1/lib/ruby/2.7.0/forwardable.rb:235:in `readmultiline'
+	 3: from /opt/rubies/ruby-2.7.1/lib/ruby/2.7.0/reline.rb:174:in `readmultiline'
+	 2: from /opt/rubies/ruby-2.7.1/lib/ruby/2.7.0/reline.rb:228:in `inner_readline'
+	 1: from /opt/rubies/ruby-2.7.1/lib/ruby/2.7.0/reline/config.rb:96:in `read'
+/opt/rubies/ruby-2.7.1/lib/ruby/2.7.0/reline/config.rb:96:in `expand_path': couldn't find login name -- expanding `~' (ArgumentError)
+```
+
+`$HOME` is not set.
+
+```text
+root@a81dcd11c994:/# echo $HOME
+
+```
+
+Set `$HOME` to `/root`
+
+```text
+root@a81dcd11c994:/root# export HOME=/root
+root@a81dcd11c994:~# echo $HOME
+/root
+```
+
+Now it works.
+
+```text
+root@a81dcd11c994:~# irb
+irb(main):001:0> exit
+root@a81dcd11c994:~#
+```
+
+
+### `ruby-install` Build Errors with OpenSSL 3
 
 Ruby 2.7.1
 
@@ -440,10 +509,6 @@ make: *** [uncommon.mk:373: do-install-all] Error 1
 !!! Installation of ruby 2.7.6 failed!
 ```
 
-
-
-
-
 # References
 
 * [Installing Ruby with ruby-build and ruby-install](https://nts.strzibny.name/ruby-build-and-ruby-install/)
@@ -452,3 +517,4 @@ make: *** [uncommon.mk:373: do-install-all] Error 1
 * [Docker Docs: Multi-stage builds](https://docs.docker.com/build/building/multi-stage/)
 * [ServerFault: Capturing STDERR and STDOUT to file using tee](https://serverfault.com/questions/201061/capturing-stderr-and-stdout-to-file-using-tee)
 * [GH: postmodern / chruby](https://github.com/postmodern/chruby)
+* [Do not rely on the the HOME variable being available in system scripts](https://www.semicolonandsons.com/code_diary/unix/do-not-rely-on-the-the-HOME-variable-being-available-in-system-scripts)
