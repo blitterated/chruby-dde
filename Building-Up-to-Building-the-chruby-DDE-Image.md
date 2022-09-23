@@ -317,3 +317,18 @@ After:
 root@1b8121f75914:/tmp/openssl-1.1.1q# ls /opt
 openssl-1.1.1q
 ```
+
+
+
+
+
+
+
+# References
+
+* [Installing Ruby with ruby-build and ruby-install](https://nts.strzibny.name/ruby-build-and-ruby-install/)
+* [GH: postmodern / ruby-install](https://github.com/postmodern/ruby-install)
+* [Installing Older Ruby Versions on Ubuntu 22.04](https://deanpcmad.com/2022/installing-older-ruby-versions-on-ubuntu-22-04/)
+* [Docker Docs: Multi-stage builds](https://docs.docker.com/build/building/multi-stage/)
+* [ServerFault: Capturing STDERR and STDOUT to file using tee](https://serverfault.com/questions/201061/capturing-stderr-and-stdout-to-file-using-tee)
+* [GH: postmodern / chruby](https://github.com/postmodern/chruby)
