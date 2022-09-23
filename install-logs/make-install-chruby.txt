@@ -1,0 +1,4 @@
+for dir in `find etc lib bin sbin share -type d 2>/dev/null`; do mkdir -p /usr/local/$dir; done
+for file in `find etc lib bin sbin share -type f 2>/dev/null`; do cp $file /usr/local/$file; done
+mkdir -p /usr/local/share/doc/chruby-0.3.9
+cp -r *.md *.txt /usr/local/share/doc/chruby-0.3.9/
