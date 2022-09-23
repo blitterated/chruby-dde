@@ -1,0 +1,4 @@
+for dir in `find bin share -type d`; do mkdir -p /usr/local/$dir; done
+for file in `find bin share -type f`; do cp $file /usr/local/$file; done
+mkdir -p /usr/local/share/doc/ruby-install-0.8.5
+cp -r *.md *.txt /usr/local/share/doc/ruby-install-0.8.5/
