@@ -1,7 +1,5 @@
 FROM dde AS builder
 
-MAINTAINER blitterated blitterated@protonmail.com
-
 RUN apt update
 RUN apt --yes upgrade
 RUN apt --yes install build-essential
@@ -20,8 +18,6 @@ RUN ./config --prefix=${OPENSSL_1_1_DIR} --openssldir=${OPENSSL_1_1_DIR}
 RUN make
 RUN make test
 RUN make install
-#RUN rm -rf ${OPENSSL_1_1_DIR}/certs
-#RUN ln -s /etc/ssl/certs ${OPENSSL_1_1_DIR}/certs
 
 # Download and install ruby-install
 ARG RUBY_INSTALL_VERSION=0.8.5
@@ -33,5 +29,21 @@ RUN tar -xzvf ruby-install-${RUBY_INSTALL_VERSION}.tar.gz
 WORKDIR /tmp/ruby-install-${RUBY_INSTALL_VERSION}/
 RUN make install
 
+# Download and install chruby
+ARG CHRUBY_VERSION=0.3.9
+
+WORKDIR /tmp
+RUN curl -L "https://github.com/postmodern/chruby/archive/v${CHRUBY_VERSION}.tar.gz" > "chruby-${CHRUBY_VERSION}.tar.gz"
+RUN tar -zxvf "/tmp/chruby-${CHRUBY_VERSION}.tar.gz"
+
+WORKDIR /tmp/chruby-${CHRUBY_VERSION}/
+RUN make install
+
+# Install some Rubies
+RUN ruby-install ruby 2.7.1 -- --with-openssl-dir="${OPENSSL_1_1_DIR}"
+RUN ruby-install ruby 2.7.6 -- --with-openssl-dir="${OPENSSL_1_1_DIR}"
+
+# 3.1.2 builds against OpenSSL 3.0.2
+RUN ruby-install ruby 3.1.2
 
 CMD ["/usr/bin/env", "bash"]
