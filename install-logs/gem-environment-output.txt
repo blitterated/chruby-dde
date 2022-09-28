@@ -1,0 +1,103 @@
+root@1a7c635c3db6:/tmp/chruby-0.3.9# gem environment
+RubyGems Environment:
+  - RUBYGEMS VERSION: 3.1.2
+  - RUBY VERSION: 2.7.1 (2020-03-31 patchlevel 83) [x86_64-linux]
+  - INSTALLATION DIRECTORY: /opt/rubies/ruby-2.7.1/lib/ruby/gems/2.7.0
+  - USER INSTALLATION DIRECTORY: /.gem/ruby/2.7.0
+  - RUBY EXECUTABLE: /opt/rubies/ruby-2.7.1/bin/ruby
+  - GIT EXECUTABLE: /usr/bin/git
+  - EXECUTABLE DIRECTORY: /opt/rubies/ruby-2.7.1/bin
+  - SPEC CACHE DIRECTORY: /.gem/specs
+  - SYSTEM CONFIGURATION DIRECTORY: /opt/rubies/ruby-2.7.1/etc
+  - RUBYGEMS PLATFORMS:
+    - ruby
+    - x86_64-linux
+  - GEM PATHS:
+     - /opt/rubies/ruby-2.7.1/lib/ruby/gems/2.7.0
+     - /.gem/ruby/2.7.0
+  - GEM CONFIGURATION:
+     - :update_sources => true
+     - :verbose => true
+     - :backtrace => false
+     - :bulk_threshold => 1000
+  - REMOTE SOURCES:
+     - https://rubygems.org/
+  - SHELL PATH:
+     - /opt/rubies/ruby-2.7.1/bin
+     - /command
+     - /usr/local/sbin
+     - /usr/local/bin
+     - /usr/sbin
+     - /usr/bin
+     - /sbin
+     - /bin
+
+
+root@1a7c635c3db6:/tmp/chruby-0.3.9# gem environment
+RubyGems Environment:
+  - RUBYGEMS VERSION: 3.1.6
+  - RUBY VERSION: 2.7.6 (2022-04-12 patchlevel 219) [x86_64-linux]
+  - INSTALLATION DIRECTORY: /opt/rubies/ruby-2.7.6/lib/ruby/gems/2.7.0
+  - USER INSTALLATION DIRECTORY: /root/.gem/ruby/2.7.0
+  - RUBY EXECUTABLE: /opt/rubies/ruby-2.7.6/bin/ruby
+  - GIT EXECUTABLE: /usr/bin/git
+  - EXECUTABLE DIRECTORY: /opt/rubies/ruby-2.7.6/bin
+  - SPEC CACHE DIRECTORY: /root/.gem/specs
+  - SYSTEM CONFIGURATION DIRECTORY: /opt/rubies/ruby-2.7.6/etc
+  - RUBYGEMS PLATFORMS:
+    - ruby
+    - x86_64-linux
+  - GEM PATHS:
+     - /opt/rubies/ruby-2.7.6/lib/ruby/gems/2.7.0
+     - /root/.gem/ruby/2.7.0
+  - GEM CONFIGURATION:
+     - :update_sources => true
+     - :verbose => true
+     - :backtrace => false
+     - :bulk_threshold => 1000
+  - REMOTE SOURCES:
+     - https://rubygems.org/
+  - SHELL PATH:
+     - /opt/rubies/ruby-2.7.6/bin
+     - /command
+     - /usr/local/sbin
+     - /usr/local/bin
+     - /usr/sbin
+     - /usr/bin
+     - /sbin
+     - /bin
+
+
+root@1a7c635c3db6:/tmp/chruby-0.3.9# gem environment
+RubyGems Environment:
+  - RUBYGEMS VERSION: 3.3.7
+  - RUBY VERSION: 3.1.2 (2022-04-12 patchlevel 20) [x86_64-linux]
+  - INSTALLATION DIRECTORY: /opt/rubies/ruby-3.1.2/lib/ruby/gems/3.1.0
+  - USER INSTALLATION DIRECTORY: /root/.local/share/gem/ruby/3.1.0
+  - RUBY EXECUTABLE: /opt/rubies/ruby-3.1.2/bin/ruby
+  - GIT EXECUTABLE: /usr/bin/git
+  - EXECUTABLE DIRECTORY: /opt/rubies/ruby-3.1.2/bin
+  - SPEC CACHE DIRECTORY: /root/.local/share/gem/specs
+  - SYSTEM CONFIGURATION DIRECTORY: /opt/rubies/ruby-3.1.2/etc
+  - RUBYGEMS PLATFORMS:
+     - ruby
+     - x86_64-linux
+  - GEM PATHS:
+     - /opt/rubies/ruby-3.1.2/lib/ruby/gems/3.1.0
+     - /root/.local/share/gem/ruby/3.1.0
+  - GEM CONFIGURATION:
+     - :update_sources => true
+     - :verbose => true
+     - :backtrace => false
+     - :bulk_threshold => 1000
+  - REMOTE SOURCES:
+     - https://rubygems.org/
+  - SHELL PATH:
+     - /opt/rubies/ruby-3.1.2/bin
+     - /command
+     - /usr/local/sbin
+     - /usr/local/bin
+     - /usr/sbin
+     - /usr/bin
+     - /sbin
+     - /bin
