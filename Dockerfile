@@ -46,4 +46,28 @@ RUN ruby-install ruby 2.7.6 -- --with-openssl-dir="${OPENSSL_1_1_DIR}"
 # 3.1.2 builds against OpenSSL 3.0.2
 RUN ruby-install ruby 3.1.2
 
+
+
+#FROM dde
+
+#RUN apt update
+#RUN apt --yes upgrade
+#RUN apt --yes install build-essential
+
+#MAINTAINER blitterated blitterated@protonmail.com
+
+# Some older ruby version have trouble if $HOME is not set
+ENV HOME=/root
+
+# We'll be running as root in the docker container
+ENV BUNDLE_SILENCE_ROOT_WARNING=1
+
+# Create a soft link to OpenSSL 3 certs for 1.1.1
+RUN rm -rf ${OPENSSL_1_1_DIR}/certs
+RUN ln -s /etc/ssl/certs ${OPENSSL_1_1_DIR}/certs
+
+WORKDIR /root
+
+COPY shell/002-chruby-activation.sh .dde.rc/002-chruby-activation.sh
+
 CMD ["/usr/bin/env", "bash"]
