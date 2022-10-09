@@ -1,3 +1,5 @@
+# Build Stage #1
+
 FROM dde AS builder
 
 RUN apt update
@@ -17,7 +19,12 @@ WORKDIR openssl-${OPENSSL_1_1_VERSION}
 RUN ./config --prefix=${OPENSSL_1_1_DIR} --openssldir=${OPENSSL_1_1_DIR}
 RUN make
 RUN make test
-RUN make install
+
+# `RUN make install` will also install man pages and html docs, which we don't need
+# We'll cherry pick the targets we want from the install target.
+# install: install_sw install_ssldirs install_docs
+RUN make install_sw
+RUN make install_ssldirs
 
 # Download and install ruby-install
 ARG RUBY_INSTALL_VERSION=0.8.5
@@ -47,6 +54,7 @@ RUN ruby-install ruby 2.7.6 -- --with-openssl-dir="${OPENSSL_1_1_DIR}"
 RUN ruby-install ruby 3.1.2
 
 
+# Build Stage #2
 
 #FROM dde
 
@@ -61,6 +69,12 @@ ENV HOME=/root
 
 # We'll be running as root in the docker container
 ENV BUNDLE_SILENCE_ROOT_WARNING=1
+
+
+
+
+
+
 
 # Create a soft link to OpenSSL 3 certs for 1.1.1
 RUN rm -rf ${OPENSSL_1_1_DIR}/certs
