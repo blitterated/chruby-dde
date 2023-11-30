@@ -32,3 +32,24 @@ ruby --version
 ``` text
 ruby 3.1.2p20 (2022-04-12 revision 4491bb740a) [aarch64-linux]
 ```
+
+### Image size
+
+The two stage build cuts the image size down from 1.3GB to 670MB.
+
+It can be cut down further by flattening it:
+
+```sh
+CONT_ID=$(docker create chruby-dde)
+docker export $CONT_ID | docker import - chruby-dde-flat
+docker rm $CONT_ID
+```
+
+Results:
+
+```text
+docker images
+REPOSITORY        TAG       IMAGE ID       CREATED          SIZE
+chruby-dde-flat   latest    cfd1d5f201d6   4 seconds ago    563MB
+chruby-dde        latest    d7c8604f8a79   23 minutes ago   668MB
+```
