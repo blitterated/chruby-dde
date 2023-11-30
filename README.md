@@ -2,8 +2,10 @@
 
 ### Build an image
 
+Log files will be written to the `build-logs` directory.
+
 ```sh
-docker build -t chruby-dde .
+./build-with-log
 ```
 
 ### Run the image
@@ -12,3 +14,10 @@ docker build -t chruby-dde .
 docker run -it --rm --name chrubydde chruby-dde
 ```
 
+__NOTE:__ if you try to run the above with `/bin/bash` appended, you'll get this error:
+
+```text
+/bin/bash: /bin/bash: cannot execute binary file
+```
+
+That's because this image is based on the [`dde`](https://github.com/blitterated/docker-dev-env/tree/master) image which has `/bin/bash` as its [`ENTRYPOINT`](https://github.com/blitterated/docker-dev-env/blob/master/Dockerfile#L16).
