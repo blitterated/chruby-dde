@@ -1,6 +1,6 @@
 #!/bin/bash
 
-IMAGE_NAME=chruby_dde
+IMAGE_NAME=chruby-dde
 
 { time docker build --progress=plain -t ${IMAGE_NAME} . ; } 2>&1 \
 | tee "./build-logs/${IMAGE_NAME}-build-$(date +'%s').log"
