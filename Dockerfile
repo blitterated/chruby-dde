@@ -7,7 +7,7 @@ ARG OPENSSL_1_1_DIR=/opt/openssl-${OPENSSL_1_1_VERSION}
 
 FROM dde AS builder
 
-RUN <<EOT bash
+RUN <<EOT bash -xe
   apt update
   apt --yes upgrade
   apt --yes install build-essential
@@ -19,13 +19,13 @@ ARG OPENSSL_1_1_VERSION
 ARG OPENSSL_1_1_DIR
 
 WORKDIR /tmp
-RUN <<EOT bash
+RUN <<EOT bash -xe
   curl -LO "https://www.openssl.org/source/openssl-${OPENSSL_1_1_VERSION}.tar.gz"
   tar zxvf openssl-${OPENSSL_1_1_VERSION}.tar.gz
 EOT
 
 WORKDIR openssl-${OPENSSL_1_1_VERSION}
-RUN <<EOT bash
+RUN <<EOT bash -xe
   ./config --prefix=${OPENSSL_1_1_DIR} --openssldir=${OPENSSL_1_1_DIR}
   make
   make test
@@ -34,7 +34,7 @@ EOT
 # `RUN make install` will also install man pages and html docs, which we don't need
 # We'll cherry pick the targets we want from the install target.
 # install: install_sw install_ssldirs install_docs
-RUN <<EOT bash
+RUN <<EOT bash -xe
   make install_sw
   make install_ssldirs
 EOT
@@ -43,28 +43,32 @@ EOT
 ARG RUBY_INSTALL_VERSION=0.8.5
 
 WORKDIR /tmp
-RUN <<EOT bash
+RUN <<EOT bash -xe
   curl -L "https://github.com/postmodern/ruby-install/archive/v${RUBY_INSTALL_VERSION}.tar.gz" > "ruby-install-${RUBY_INSTALL_VERSION}.tar.gz"
   tar -xzvf ruby-install-${RUBY_INSTALL_VERSION}.tar.gz
 EOT
 
 WORKDIR /tmp/ruby-install-${RUBY_INSTALL_VERSION}/
-RUN make install
+RUN <<EOT bash -xe
+  make install
+EOT
 
 # Download and install chruby
 ARG CHRUBY_VERSION=0.3.9
 
 WORKDIR /tmp
-RUN <<EOT bash
+RUN <<EOT bash -xe
   curl -L "https://github.com/postmodern/chruby/archive/v${CHRUBY_VERSION}.tar.gz" > "chruby-${CHRUBY_VERSION}.tar.gz"
   tar -zxvf "/tmp/chruby-${CHRUBY_VERSION}.tar.gz"
 EOT
 
 WORKDIR /tmp/chruby-${CHRUBY_VERSION}/
-RUN make install
+RUN <<EOT bash -xe
+  make install
+EOT
 
 # Install some Rubies
-RUN <<EOT bash
+RUN <<EOT bash -xe
   ruby-install ruby 2.7.1 -- --with-openssl-dir="${OPENSSL_1_1_DIR}"
   #ruby-install ruby 2.7.6 -- --with-openssl-dir="${OPENSSL_1_1_DIR}"
 
@@ -76,7 +80,7 @@ EOT
 
 FROM dde
 
-RUN <<EOT bash
+RUN <<EOT bash -xe
   apt update
   apt --yes upgrade
 EOT
@@ -101,7 +105,7 @@ COPY --from=builder /usr/local/bin/ruby-install /usr/local/bin/ruby-install
 COPY --from=builder /opt /opt
 
 # Create a soft link to OpenSSL 3 certs for 1.1.1
-RUN <<EOT bash
+RUN <<EOT bash -xe
   rm -rf ${OPENSSL_1_1_DIR}/certs
   ln -s /etc/ssl/certs ${OPENSSL_1_1_DIR}/certs
 EOT
