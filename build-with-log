@@ -1,6 +1,79 @@
 #!/bin/bash
 
-IMAGE_NAME=chruby-dde
+IMAGE_TAG=chruby-dde
 
-{ time docker build --progress=plain -t ${IMAGE_NAME} . ; } 2>&1 \
-| tee "./build-logs/${IMAGE_NAME}-build-$(date +'%s').log"
+RUBY_INSTALL_VERSION=0.8.5
+CHRUBY_VERSION=0.3.9
+USES_OPENSSL_1=no
+SUPPLIED_RUBY_VERSIONS=()
+
+source "shell/debug_build_with_rubies.sh"
+
+# A leading ':' turns off error messages
+# Use 't:r:' to see error messages
+# Use ':t:r:' to suppress error messages
+# Ordering matters, so don't alphabetize 't:r:'
+while getopts 't:r:' OPTIONS; do
+  case "$OPTIONS" in
+  t)
+    IMAGE_TAG=${OPTARG}
+    ;;
+  r)
+    SUPPLIED_RUBY_VERSIONS+=("$OPTARG")
+    ;;
+  ?)
+    echo "Usage: $(basename $0) [-t IMAGE_TAG] [-r RUBY_VERSION]*"
+    exit 1
+    ;;
+  esac
+done
+
+#debug_log_ruby_versions
+
+
+# Flatten out the ruby version array into a space separated string
+INSTALL_THESE_RUBY_VERSIONS="${SUPPLIED_RUBY_VERSIONS[*]}"
+
+#debug_log_flattened_ruby_versions
+
+# Determine if OpenSSL 1.1 needs to be installed or not.
+is_openssl_1_needed () {
+  version=$1
+  is_needed="no"
+  if [[ $version < 3.2.0 ]]; then is_needed="yes"; fi
+  echo "${is_needed}"
+}
+
+#test_is_openssl_1_needed
+#debug_log_is_openssl_1_needed
+
+check_all_supplied_ruby_versions_for_openssl_1_dependency () {
+  for version in "${SUPPLIED_RUBY_VERSIONS[@]}"; do
+    USES_OPENSSL_1="$(is_openssl_1_needed "${version}")" # <== quoting issue
+    if [[ "${USES_OPENSSL_1}" == "yes" ]]; then break; fi
+  done
+}
+
+#debug_log_check_all_supplied_ruby_versions_for_openssl_1_dependency
+
+
+build_image () {
+  docker build \
+    --build-arg RUBY_INSTALL_VERSION="${RUBY_INSTALL_VERSION}" \
+    --build-arg CHRUBY_VERSION="${CHRUBY_VERSION}" \
+    --build-arg USES_OPENSSL_1="${USES_OPENSSL_1}" \
+    --build-arg INSTALL_THESE_RUBY_VERSIONS="${INSTALL_THESE_RUBY_VERSIONS}" \
+    --progress=plain \
+    -t "${IMAGE_TAG}" \
+    .
+}
+
+BUILD_LOGFILE="./build-logs/${IMAGE_TAG}-build-$(date +'%s').log"
+
+debug_log_build_logfile () {
+  echo -e "\ndebug_log_build_logfile()\n----------------------------------------"
+  echo "build logfile: ${BUILD_LOGFILE}"
+}
+#debug_log_build_logfile
+
+{ time build_image ; } 2>&1 | tee $BUILD_LOGFILE
