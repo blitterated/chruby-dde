@@ -1,8 +1,5 @@
 # syntax=docker/dockerfile:1
 
-ARG OPENSSL_1_1_VERSION=1.1.1q
-ARG OPENSSL_1_1_DIR=/opt/openssl-${OPENSSL_1_1_VERSION}
-
 #################### Build Stage 1 ####################
 
 FROM dde AS builder
@@ -11,36 +8,13 @@ RUN <<EOT bash -xe
   apt update
   apt --yes upgrade
   apt --yes install build-essential
-EOT
 
-# Install openssl 1.1.1 from source
-# https://deanpcmad.com/2022/installing-older-ruby-versions-on-ubuntu-22-04/
-ARG OPENSSL_1_1_VERSION
-ARG OPENSSL_1_1_DIR
-
-WORKDIR /tmp
-RUN <<EOT bash -xe
-  curl -LO "https://www.openssl.org/source/openssl-${OPENSSL_1_1_VERSION}.tar.gz"
-  tar zxvf openssl-${OPENSSL_1_1_VERSION}.tar.gz
-EOT
-
-WORKDIR openssl-${OPENSSL_1_1_VERSION}
-RUN <<EOT bash -xe
-  ./config --prefix=${OPENSSL_1_1_DIR} --openssldir=${OPENSSL_1_1_DIR}
-  make
-  make test
-EOT
-
-# `RUN make install` will also install man pages and html docs, which we don't need
-# We'll cherry pick the targets we want from the install target.
-# install: install_sw install_ssldirs install_docs
-RUN <<EOT bash -xe
-  make install_sw
-  make install_ssldirs
+  # required by pry gem
+  apt --yes install libyaml-0-2
 EOT
 
 # Download and install ruby-install
-ARG RUBY_INSTALL_VERSION=0.8.5
+ARG RUBY_INSTALL_VERSION=0.9.3
 
 WORKDIR /tmp
 RUN <<EOT bash -xe
@@ -67,13 +41,9 @@ RUN <<EOT bash -xe
   make install
 EOT
 
-# Install some Rubies
+# Install Ruby and gems
 RUN <<EOT bash -xe
-  ruby-install ruby 2.7.1 -- --with-openssl-dir="${OPENSSL_1_1_DIR}"
-  #ruby-install ruby 2.7.6 -- --with-openssl-dir="${OPENSSL_1_1_DIR}"
-
-  # 3.1.2 builds against OpenSSL 3.0.2
-  ruby-install ruby 3.1.2
+  ruby-install ruby 3.3.0
 EOT
 
 #################### Build Stage 2 ####################
@@ -103,12 +73,6 @@ COPY --from=builder /usr/local/bin/ruby-install /usr/local/bin/ruby-install
 
 # This copies the rubies and the old openssl
 COPY --from=builder /opt /opt
-
-# Create a soft link to OpenSSL 3 certs for 1.1.1
-RUN <<EOT bash -xe
-  rm -rf ${OPENSSL_1_1_DIR}/certs
-  ln -s /etc/ssl/certs ${OPENSSL_1_1_DIR}/certs
-EOT
 
 WORKDIR /root
 
