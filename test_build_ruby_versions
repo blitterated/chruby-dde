@@ -1,0 +1,17 @@
+#!/bin/bash
+
+tag=test_passing_ruby_versions
+
+if [ -z "$(docker image inspect $tag 2>&1 1>/dev/null)" ]; then
+  docker rmi $tag
+fi
+
+TEST_RUBY_VERSIONS="3.3.0"
+
+time docker build \
+  --no-cache \
+  --progress=plain \
+  -t "${tag}" \
+  --build-arg RUBY_VERSIONS="${TEST_RUBY_VERSIONS}" \
+  --build-arg USES_OPENSSL_1="yes" \
+  .
